@@ -1,0 +1,82 @@
+{
+  "name": "Fact Check AI",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Get the list of claims from the previous node's output\nconst claims = $input.item.json.claims;\n\n// If there are no claims, return nothing.\nif (!claims || claims.length === 0) {\n  return [];\n}\n\n// .map() is a function that loops through each item in a list\n// and creates a new, transformed list.\nconst formattedResults = claims.map(claim => {\n  \n  // For each claim, we create a new clean object\n  return {\n    json: {\n      Verdict: claim.claimReview?.[0]?.textualRating,\n      Claim: claim.text,\n      FactChecker: claim.claimReview?.[0]?.publisher?.name,\n      SourceURL: claim.claimReview?.[0]?.url,\n      FactCheckTitle: claim.claimReview?.[0]?.title,\n    }\n  };\n});\n\n// Return the new list of formatted fact-checks\nreturn formattedResults;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "568c8bd0-e715-4274-a2f7-37260373426c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7fce0032-d801-4a85-9a8d-bba4e82da065",
+      "name": "When chat message received",
+      "webhookId": "65816adf-f85a-4f05-bf0f-5b66a0aa6b3c"
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.chatInput }}",
+        "requestOptions": {}
+      },
+      "type": "CUSTOM.FactCheck",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "54d3fbc6-d977-427f-af41-e51d0df31256",
+      "name": "Fact Check AI"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Fact Check AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fact Check AI": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f454c16-4340-4a86-b624-dc932ad2a828",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6ef8f1002b6b50d74eee3ad2a43a14fe456e824f9e761d174b2ea7ea5c6b7ca"
+  },
+  "id": "a252zKL3Sid0gmM1",
+  "tags": []
+}
